@@ -87,6 +87,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,8,15,.88);backdrop-filte
 .stat-lim .num{color:var(--cyan)}
 .stat-both .num{color:var(--gold)}
 .stat-bare .num{color:var(--silver)}
+.stat-fig .num{color:#f97316}
+.stat-blu .num{color:#a78bfa}
 </style>
 
 <section class="hero">
@@ -97,6 +99,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,8,15,.88);backdrop-filte
     <div class="stat-pill stat-lim"><span class="num" id="cnt-lim">—</span><span class="lbl">Edycje limitowane</span></div>
     <div class="stat-pill stat-both"><span class="num" id="cnt-both">—</span><span class="lbl">Steelbook + Gra</span></div>
     <div class="stat-pill stat-bare"><span class="num" id="cnt-bare">—</span><span class="lbl">Same steelbooki</span></div>
+    <div class="stat-pill stat-fig"><span class="num" id="cnt-fig">—</span><span class="lbl">Figurki</span></div>
+    <div class="stat-pill stat-blu"><span class="num" id="cnt-blu">—</span><span class="lbl">Blu-ray</span></div>
   </div>
 </section>
 
@@ -123,6 +127,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,8,15,.88);backdrop-filte
 .tp.on-lim {background:var(--cyan);border-color:var(--cyan);color:#000}
 .tp.on-both{background:linear-gradient(90deg,var(--gold),var(--gold2));border-color:var(--gold);color:#000}
 .tp.on-bare{background:var(--silver);border-color:var(--silver);color:#000}
+.tp.on-fig {background:#f97316;border-color:#f97316;color:#000}
+.tp.on-blu {background:#a78bfa;border-color:#a78bfa;color:#000}
 .avail-toggle{display:flex;align-items:center;gap:.4rem;cursor:pointer;margin-left:auto}
 .avail-toggle input{display:none}
 .toggle-track{width:34px;height:18px;background:#222;border-radius:999px;
@@ -144,6 +150,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,8,15,.88);backdrop-filte
       <button class="tp" data-type="Edycja Limitowana">Edycje Limitowane</button>
       <button class="tp" data-type="Steelbook + Gra">Steelbook + Gra</button>
       <button class="tp" data-type="Sam Steelbook">Sam Steelbook</button>
+      <button class="tp" data-type="Figurka">Figurki</button>
+      <button class="tp" data-type="Film Blu-ray">Blu-ray</button>
     </div>
     <label class="avail-toggle">
       <input type="checkbox" id="fAvail">
@@ -200,6 +208,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(8,8,15,.88);backdrop-filte
 .badge-lim {background:rgba(0,242,255,.85);color:#000}
 .badge-both{background:linear-gradient(90deg,rgba(240,192,64,.92),rgba(224,123,16,.92));color:#000}
 .badge-bare{background:rgba(192,200,216,.85);color:#000}
+.badge-fig {background:rgba(249,115,22,.85);color:#000}
+.badge-blu {background:rgba(167,139,250,.85);color:#000}
 .card-dot{position:absolute;bottom:7px;left:7px;z-index:4;width:8px;height:8px;
   border-radius:50%;box-shadow:0 0 6px currentColor}
 .dot-yes{background:var(--green);color:var(--green)}
@@ -433,6 +443,8 @@ function typeBadge(type) {
   if (type === 'Edycja Limitowana') return '<span class="card-type-badge badge-lim">LIM.ED</span>';
   if (type === 'Steelbook + Gra')   return '<span class="card-type-badge badge-both">STEEL+GRA</span>';
   if (type === 'Sam Steelbook')     return '<span class="card-type-badge badge-bare">STEELBOOK</span>';
+  if (type === 'Figurka')           return '<span class="card-type-badge badge-fig">FIGURKA</span>';
+  if (type === 'Film Blu-ray')      return '<span class="card-type-badge badge-blu">BLU-RAY</span>';
   return '';
 }
 
@@ -440,6 +452,8 @@ function typeLabel(type) {
   if (type === 'Edycja Limitowana') return '🎮 Edycje Limitowane';
   if (type === 'Steelbook + Gra')   return '📦 Steelbook + Gra';
   if (type === 'Sam Steelbook')     return '🗂️ Same Steelbooki';
+  if (type === 'Figurka')           return '🗿 Figurki';
+  if (type === 'Film Blu-ray')      return '🎬 Filmy Blu-ray';
   return type;
 }
 
@@ -456,7 +470,7 @@ function renderShelf(items) {
   empty.style.display   = 'none';
   section.style.display = 'block';
 
-  const ORDER = ['Edycja Limitowana', 'Steelbook + Gra', 'Sam Steelbook'];
+  const ORDER = ['Edycja Limitowana', 'Steelbook + Gra', 'Sam Steelbook', 'Figurka', 'Film Blu-ray'];
   const groups = {};
   ORDER.forEach(t => groups[t] = []);
   items.forEach(item => {
@@ -545,6 +559,8 @@ function updateStats(items) {
   document.getElementById('cnt-lim').textContent  = items.filter(i => i.type === 'Edycja Limitowana').length;
   document.getElementById('cnt-both').textContent = items.filter(i => i.type === 'Steelbook + Gra').length;
   document.getElementById('cnt-bare').textContent = items.filter(i => i.type === 'Sam Steelbook').length;
+  document.getElementById('cnt-fig').textContent  = items.filter(i => i.type === 'Figurka').length;
+  document.getElementById('cnt-blu').textContent  = items.filter(i => i.type === 'Film Blu-ray').length;
 }
 
 // Type pills
@@ -552,10 +568,12 @@ document.querySelectorAll('.tp').forEach(btn => {
   btn.addEventListener('click', () => {
     activeType = btn.dataset.type;
     document.querySelectorAll('.tp').forEach(b => b.className = 'tp');
-    if (activeType === 'all')                btn.classList.add('on-all');
+    if (activeType === 'all')                    btn.classList.add('on-all');
     else if (activeType === 'Edycja Limitowana') btn.classList.add('on-lim');
     else if (activeType === 'Steelbook + Gra')   btn.classList.add('on-both');
-    else if (activeType === 'Sam Steelbook')      btn.classList.add('on-bare');
+    else if (activeType === 'Sam Steelbook')     btn.classList.add('on-bare');
+    else if (activeType === 'Figurka')           btn.classList.add('on-fig');
+    else if (activeType === 'Film Blu-ray')      btn.classList.add('on-blu');
     applyFilters();
   });
 });
